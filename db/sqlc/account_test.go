@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"github.com/ramdoni007/Take_Easy_Bank/util"
 	"github.com/stretchr/testify/require"
 	"testing"
 
@@ -10,9 +11,9 @@ import (
 
 func TestCreateAccount(t *testing.T) {
 	arg := CreateAccountParams{
-		Owner: "Ravie",
-		Balance: 100 ,
-		Currency: "USD",
+		Owner: util.RandomOwner(),
+		Balance: util.RandomMoney(),
+		Currency: util.RandomCurrency(),
 	}
 	account,err := testQueris.CreateAccount(context.Background(),arg)
 	require.NoError(t, err)
