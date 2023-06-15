@@ -52,6 +52,6 @@ type TranfeTxResult struct {
 //TranferTx performs a money tranfers from one account to the other.
 // It creates a tranfers record, add accounts , and update account balance within single database transaction
 
-func (store *Store) TranferTx(ctx context.Context, arg TranferTxParams) (TranferTxResult error)
-
-}
+//func (store *Store) TranferTx(ctx context.Context, arg TranferTxParams) (TranferTxResult error)
+//
+//}
