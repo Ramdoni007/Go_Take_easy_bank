@@ -39,19 +39,59 @@ func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
 }
 
 //
-type TranferTxParams struct {
+type TransferTxParams struct {
 	FromAccountID int64 `json:"from_account_id"`
 	ToAccountID   int64 `json:"to_account_id"`
 	Amount        int64 `json:"amount"`
 }
 
-type TranfeTxResult struct {
-	//Problem and solve ulang video sebelumnya buat test entry and tranfers :)
+type TransferTxResult struct {
+	Transfer    Transfer `json:"transfer"`
+	FromAccount Account  `json:"from_account"`
+	ToAccount   Account  `json:"to_account "`
+	FromEntry   Entry    `json:"from_entry"`
+	ToEntry     Entry    `json:"to_entry"`
 }
 
 //TranferTx performs a money tranfers from one account to the other.
 // It creates a tranfers record, add accounts , and update account balance within single database transaction
+func (store *Store) TranferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
+	var result TransferTxResult
 
-//func (store *Store) TranferTx(ctx context.Context, arg TranferTxParams) (TranferTxResult error)
-//
-//}
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		result.Transfer, err = q.CreateTransfer(ctx, CreateTransferParams{
+			FromAccountID: arg.FromAccountID,
+			ToAccountID:   arg.ToAccountID,
+			Amount:        arg.Amount,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		result.FromEntry, err = q.CreateEntry(ctx, CreateEntryParams{
+			AccountID: arg.FromAccountID,
+			Amount:    -arg.Amount,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		result.ToEntry, err = q.CreateEntry(ctx, CreateEntryParams{
+			AccountID: arg.ToAccountID,
+			Amount:    arg.Amount,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		return nil
+		// TODO: update accounts ,balance :)
+	})
+
+	return result, err
+}

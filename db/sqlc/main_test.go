@@ -14,14 +14,17 @@ const (
 )
 
 var testQueris *Queries
+var testDB *sql.DB
 
 func TestMain(m *testing.M) {
-	conn, err := sql.Open(dbDriver, dbSource)
+	var err error
+
+	testDB, err = sql.Open(dbDriver, dbSource)
 	if err != nil {
 		log.Fatal("tidak bisa terhubung ke database ", err)
 	}
 
-	testQueris = New(conn)
+	testQueris = New(testDB)
 
 	os.Exit(m.Run())
 }
