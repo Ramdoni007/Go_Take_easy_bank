@@ -2,16 +2,19 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 // update worker next time add unit testing this bellow function :)
 func TestTransferTx(t *testing.T) {
+	existed := make(map[int]bool)
 	store := NewStore(testDB)
 
 	account1 := createRandomAccount(t)
 	account2 := createRandomAccount(t)
+	fmt.Println("SEBELUM SALDO DI UPDATED :", account1.Balance, account2.Balance)
 
 	n := 5
 	amount := int64(10)
@@ -78,8 +81,43 @@ func TestTransferTx(t *testing.T) {
 		_, err = store.GetEntry(context.Background(), toEntry.ID)
 		require.NoError(t, err)
 
-		// Todo Add check acoount Balance Soon
+		// check Accounts
+		// cek dimana saldo akun keluar
+		fromAccount := result.FromAccount
+		require.NotEmpty(t, fromAccount)
+		require.Equal(t, account1.ID, fromAccount.ID)
+
+		// cek dimana saldo itu masuk
+		toAccount := result.ToAccount
+		require.NotEmpty(t, toAccount)
+		require.Equal(t, account2.ID, toAccount.ID)
+
+		// cek perbedaan anatara akun yang melakukan transaksi
+		fmt.Println("SALDO SETIAP TRANSAKSI:", fromAccount.Balance, toAccount.Balance)
+		diff1 := account1.Balance - fromAccount.Balance
+		diff2 := toAccount.Balance - account2.Balance
+		require.Equal(t, diff1, diff2)
+		require.True(t, diff1 > 0)
+		require.True(t, diff1%amount == 0) // jadi jumlah transaksid ke-1 , ke-2 , ke -3 dst harus sesuai kelipatanya
+
+		// ini buat variable k untuk meng analogikan saldo nya
+		k := int(diff1 / amount)
+		require.True(t, k >= 1 && k <= n)
+		require.NotContains(t, existed, k)
+		existed[k] = true
 
 	}
+
+	// Check Final update Balance saldo kita. dengan cara check database
+	UpdatedAccount1, err := testQueris.GetAccount(context.Background(), account1.ID)
+	require.NoError(t, err)
+	UpdatedAccount2, err := testQueris.GetAccount(context.Background(), account2.ID)
+	require.NoError(t, err)
+
+	fmt.Println("SETELAH UPDATE SALDO:", UpdatedAccount1.Balance, UpdatedAccount2.Balance)
+	require.Equal(t, account1.Balance-int64(n)*amount, UpdatedAccount1.Balance)
+	require.Equal(t, account2.Balance+int64(n)*amount, UpdatedAccount2.Balance)
+
+	// TODO SOON : YAITU FIXED ISSUE DEADLOCK IN MY PROJECT
 
 }
