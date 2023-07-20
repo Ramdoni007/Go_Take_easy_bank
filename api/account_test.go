@@ -55,9 +55,7 @@ func TestGetAccountAPI(t *testing.T) {
 					Return(account, nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				fmt.Println("TestError")
 				require.Equal(t, http.StatusOK, recorder.Code)
-				fmt.Println("testtttttttt")
 				requireBodyMatchAccount(t, recorder.Body, account)
 			},
 		},
@@ -74,6 +72,31 @@ func TestGetAccountAPI(t *testing.T) {
 				require.Equal(t, http.StatusNotFound, recorder.Code)
 			},
 		},
+		{
+			name:      "InternalError",
+			AccountID: account.ID,
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
+					Times(1).
+					Return(db.Account{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name:      "InvalidID",
+			AccountID: 0,
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetAccount(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
 	}
 	for i := range testCase {
 		tc := testCase[i]
@@ -88,7 +111,7 @@ func TestGetAccountAPI(t *testing.T) {
 			server := NewServer(store)
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/accounts/%d", account.ID)
+			url := fmt.Sprintf("/accounts/%d", tc.AccountID)
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
