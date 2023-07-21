@@ -4,7 +4,7 @@ package util
 const (
 	USD = "USD"
 	EUR = "EUR"
-	IDR = "CAD"
+	IDR = "IDR"
 )
 
 func IsSupportedCurrency(currency string) bool {
