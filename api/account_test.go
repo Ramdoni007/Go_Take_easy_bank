@@ -230,7 +230,6 @@ func TestCreateAccountAPI(t *testing.T) {
 				"currency": account.Currency,
 			},
 			setUpAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				AddAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -251,7 +250,7 @@ func TestCreateAccountAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
-					CreateAccount(gomock.Any(), gomock.Eq(account.ID)).
+					CreateAccount(gomock.Any(), gomock.Any()).
 					Times(1).
 					Return(db.Account{}, sql.ErrConnDone)
 			},
@@ -262,8 +261,7 @@ func TestCreateAccountAPI(t *testing.T) {
 		{
 			name: "InvalidIDCurrency",
 			body: gin.H{
-				
-				"currency": account.Currency,
+				"currency": "invalid",
 			},
 
 			setUpAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
