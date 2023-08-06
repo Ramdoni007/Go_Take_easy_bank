@@ -2,10 +2,11 @@ package db
 
 import (
 	"context"
-	"github.com/ramdoni007/Take_Easy_Bank/util"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/ramdoni007/Take_Easy_Bank/util"
+	"github.com/stretchr/testify/require"
 )
 
 func createRandomUser(t *testing.T) User {
