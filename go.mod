@@ -1,6 +1,6 @@
 module github.com/ramdoni007/Take_Easy_Bank
 
-go 1.18
+go 1.22.0
 
 require (
 	github.com/gin-gonic/gin v1.9.1

@@ -5,6 +5,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/ramdoni007/Take_Easy_Bank/db/mock"
@@ -12,11 +18,6 @@ import (
 	"github.com/ramdoni007/Take_Easy_Bank/token"
 	"github.com/ramdoni007/Take_Easy_Bank/util"
 	"github.com/stretchr/testify/require"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-	"time"
 )
 
 func randomAccount(owner string) db.Account {
@@ -36,7 +37,6 @@ func requireBodyMatchAccount(t *testing.T, body *bytes.Buffer, account db.Accoun
 	err = json.Unmarshal(data, &gotAccount)
 	require.NoError(t, err)
 	require.Equal(t, account, gotAccount)
-
 }
 
 func requireBodyMatchAccounts(t *testing.T, body *bytes.Buffer, accounts []db.Account) {
@@ -47,7 +47,6 @@ func requireBodyMatchAccounts(t *testing.T, body *bytes.Buffer, accounts []db.Ac
 	err = json.Unmarshal(data, &gotAccounts)
 	require.NoError(t, err)
 	require.Equal(t, accounts, gotAccounts)
-
 }
 
 func TestGetAccountAPI(t *testing.T) {
@@ -93,7 +92,6 @@ func TestGetAccountAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
-
 			},
 		},
 
@@ -169,7 +167,7 @@ func TestGetAccountAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			//start server and send request
+			// start server and send request
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
@@ -180,12 +178,11 @@ func TestGetAccountAPI(t *testing.T) {
 			tc.setUpAuth(t, request, server.tokenMaker)
 			server.router.ServeHTTP(recorder, request)
 
-			//Check Response
+			// Check Response
 			tc.checkResponse(t, recorder)
 		})
 
 	}
-
 }
 
 func TestCreateAccountAPI(t *testing.T) {
@@ -288,7 +285,7 @@ func TestCreateAccountAPI(t *testing.T) {
 
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
-			//start server and send request
+			// start server and send request
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
@@ -299,12 +296,11 @@ func TestCreateAccountAPI(t *testing.T) {
 			tc.setUpAuth(t, request, server.tokenMaker)
 			server.router.ServeHTTP(recorder, request)
 
-			//Check Response
+			// Check Response
 			tc.checkResponse(t, recorder)
 		})
 
 	}
-
 }
 
 func TestListAccountAPI(t *testing.T) {
@@ -437,7 +433,7 @@ func TestListAccountAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			//start server and send request
+			// start server and send request
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
@@ -454,10 +450,9 @@ func TestListAccountAPI(t *testing.T) {
 			tc.setUpAuth(t, request, server.tokenMaker)
 			server.router.ServeHTTP(recorder, request)
 
-			//Check Response
+			// Check Response
 			tc.checkResponse(t, recorder)
 		})
 
 	}
-
 }
