@@ -19,12 +19,13 @@ func main() {
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatal("tidak bisa terhubung ke database ", err)
+
 	}
 
 	store := db.NewStore(conn)
 	server, err := api.NewServer(config, store)
 	if err != nil {
-		log.Fatal("Tidak Bisa membuat server baru: ", err)
+		log.Fatal("tidak Bisa membuat server baru: ", err)
 	}
 	err = server.Start(config.ServerAddress)
 	if err != nil {

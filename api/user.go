@@ -120,3 +120,5 @@ func (server *Server) loginUser(ctx *gin.Context) {
 		User:        newUserResponse(user)}
 	ctx.JSON(http.StatusOK, rsp)
 }
+
+

@@ -1,0 +1,19 @@
+### Send POST request with json body ( Login Request )
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "username": "jajang",
+  "password": "secret"
+}
+
+### Send POST request with json body ( CreateUser Request )
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "username": "jajang",
+  "password": "bambang",
+  "full_name": "Jajang PelekMio",
+  "email": "jang24@gmail.com"
+}
